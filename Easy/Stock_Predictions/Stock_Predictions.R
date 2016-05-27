@@ -18,16 +18,19 @@ Stocks=(data.frame(inputset[2:(stocks_available+1),]))
 Buysell=data.frame(Name=character(),BS=character(),Amount=integer(),stringsAsFactors=FALSE)
 
 Buysell[1,1]=as.character(Stocks[1,1])
-if(as.numeric(Stocks[2,6])>as.numeric(Stocks[2,7])){
+if(as.numeric(Stocks[2,6])>as.numeric(Stocks[1,7])){
   #Price dropped, buy
   Buysell[1,2]='BUY'
-  Buysell[1,3]=floor(money/as.numeric(Stocks[2,7]))
+  Buysell[1,3]=floor(money/as.numeric(Stocks[1,7]))
   }else{
     #Price raised, sell
     Buysell[1,2]='SELL'
-    Buysell[1,3]=as.numeric(Stocks[2,2])
-}
+    Buysell[1,3]=as.numeric(Stocks[1,2])
 
-result=Buysell
+}
+if (Buysell[1,3]==0){
+  cat("0\n")
+}else{
 cat("1\n")
-cat(sprintf("%s", result),sep=" ")
+cat(sprintf("%s", Buysell),sep=" ")
+}
