@@ -1,0 +1,7 @@
+Physics.Scores=c(15,12,8,8,7,7,7,6,5,3)
+History.Scores=c(10,25,17,11,13,17,20,13,9,15)
+Scores=data.frame(Physics=Physics.Scores,History=History.Scores)
+lmfit=lm(History~Physics,data=Scores)
+newvalues=data.frame(Physics=c(10))
+result=predict.lm(lmfit,newdata=newvalues)
+cat(sprintf("%.1f", result ))
