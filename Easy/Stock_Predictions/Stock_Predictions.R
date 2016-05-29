@@ -21,34 +21,46 @@ Buysell=data.frame(Name="STOCK",BS="BUY/SELL",Amount=0,stringsAsFactors=FALSE)
 
 ScanStocks=Stocks
 counter=1
-ScanStocks=cbind(ScanStocks,abs(ScanStocks[,7]-ScanStocks[,6]))
+ScanStocks=cbind(ScanStocks,abs(ScanStocks[,6]-ScanStocks[,7]))
 while (dim(ScanStocks)[1]>0) {
   
-#search biggest relative difference (max(|today-yesterday|/today))
-focus=which.max(ScanStocks[,8])
-#write.table(ScanStocks[focus,],row.names=F,col.names=F)
-Buysell[counter,1]=as.character(ScanStocks[focus,1])
-if(as.numeric(ScanStocks[focus,6])>as.numeric(ScanStocks[focus,7])){
-  #Price dropped, buy
-  Buysell[counter,2]='BUY'
-  Buysell[counter,3]=floor(money/as.numeric(ScanStocks[focus,7]))
-  money=money-Buysell[counter,3]*as.numeric(ScanStocks[focus,7])
+  #search biggest relative difference (min or max(yest-tod))
+  focus=which.max(ScanStocks[,8])# SELL first
+  if(as.numeric(ScanStocks[focus,6])>as.numeric(ScanStocks[focus,7]))
+  {focus=which.max(ScanStocks[,8])}# now BUY
+  #write.table(ScanStocks[focus,],row.names=F,col.names=F)
+  Buysell[counter,1]=as.character(ScanStocks[focus,1])
+  if(as.numeric(ScanStocks[focus,6])>as.numeric(ScanStocks[focus,7])){
+    #Price dropped, buy
+    Buysell[counter,2]='BUY'
+    Buysell[counter,3]=floor(money/as.numeric(ScanStocks[focus,7]))
+    money=money-Buysell[counter,3]*as.numeric(ScanStocks[focus,7])
   }else{
     #Price raised, sell
     Buysell[counter,2]='SELL'
     Buysell[counter,3]=as.numeric(ScanStocks[focus,2])
-
   }
- # write.table(Buysell,col.names=F,row.names=F)
+  #quick fix: only BUY/SELL when this is 2nd day of asc/desc:
+  if (Buysell[counter,2]=='BUY'){
+    if(as.numeric(ScanStocks[focus,5])<as.numeric(ScanStocks[focus,6])){
+      #Buysell[counter,3]=0
+    }
+  }else{
+    if(as.numeric(ScanStocks[focus,5])>as.numeric(ScanStocks[focus,6])){
+      #Buysell[counter,3]=0
+    }
+  }
+  
+  # write.table(Buysell,col.names=F,row.names=F)
   if (Buysell[counter,3]!=0){counter=counter+1}else{Buysell=Buysell[-counter,]}
   ScanStocks=ScanStocks[-focus,]
-
 }
+
 counter=counter-1
 if (counter==0){
   cat("0\n")
 }else{
-cat("1\n")
-write.table(Buysell,row.names=FALSE,col.names=FALSE,quote=FALSE)
+  cat("1\n")
+  write.table(Buysell,row.names=FALSE,col.names=FALSE,quote=FALSE)
 }
 
