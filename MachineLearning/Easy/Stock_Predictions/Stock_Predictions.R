@@ -1,4 +1,4 @@
-inputset <- read.csv("H:/R/Hackerrank/Easy/Stock_Predictions/input.txt",header=FALSE,sep=" ")
+inputset <- read.csv("H:/R/Hackerrank/MachineLearning/Easy/Stock_Predictions/input.txt",header=FALSE,sep=" ")
 #inputset <- read.csv(file("stdin"),header=FALSE,sep=" ")
 
 # 1st attempt: focus on 1st stock: sell if higher than yesterday, buy if lower than yesterday

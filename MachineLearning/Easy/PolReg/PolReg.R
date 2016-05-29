@@ -1,4 +1,4 @@
-inputset <- read.csv("H:/R/Hackerrank/Easy/PolReg/Input.txt",header=FALSE,sep=" ")
+inputset <- read.csv("H:/R/Hackerrank/MachineLearning/Easy/PolReg/Input.txt",header=FALSE,sep=" ")
 #inputset <- read.csv(file("stdin"),header=FALSE,sep=" ")
 FF=inputset[1,1]
 NN=inputset[1,2]

@@ -1,6 +1,6 @@
 
 
-inputset <- read.csv("H:/R/Hackerrank/Easy/BasicStat/input.txt",header=FALSE,sep=" ")
+inputset <- read.csv("H:/R/Hackerrank/MachineLearning/Easy/BasicStat/input.txt",header=FALSE,sep=" ")
 #inputset <- read.csv(file("stdin"),header=FALSE,sep=" ")
 Mode <- function(x) {
   temp=table(x)
