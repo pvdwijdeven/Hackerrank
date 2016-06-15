@@ -3,7 +3,7 @@
 
 filename <- file("H:/R/Hackerrank/MachineLearning/Medium/Snakes&Ladders/input.txt", "r")
 ntests=as.numeric(readLines(filename,n=1))
-for (i in 1:3){
+for (i in 1:ntests){
   #dicelist
   inputline=readLines(filename,n=1)
   dicelist=matrix(unlist(strsplit(inputline,split=",")))

@@ -1,0 +1,5 @@
+Fastest stemmer
+Best stemmer
+Fastest Algorithm
+Best Algorithm
+Stop words y/n?
