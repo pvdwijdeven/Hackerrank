@@ -6,7 +6,7 @@ Created on Fri Jun 17 16:33:09 2016
 """
 import sys
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
 vectorizer = TfidfVectorizer()
 
 try:
@@ -50,11 +50,13 @@ for x in Trainingdata:
     thisteam=""
     for i in range(0,5):
         thisteam+=" "+(cur_data[i].replace(" ",""))
+    thisteam=" ".join(sorted(thisteam.strip()))
     winlose_Y.append(-1*(cur_win-2))
     winlose_X.append(thisteam.strip())
     thisteam=""
     for i in range(5,10):
         thisteam+=" "+(cur_data[i].replace(" ",""))
+    thisteam=" ".join(sorted(thisteam.split(" ")))
     winlose_Y.append(cur_win-1)
     winlose_X.append(thisteam.strip())
 
@@ -73,9 +75,11 @@ for i in range(1,nsamp+1):
             team1+=" "+players[j].replace(" ","")
         else:
             team2+=" "+players[j].replace(" ","")
+    team1=" ".join(sorted(team1.split()))
+    team2=" ".join(sorted(team2.split()))    
     test_X_team1.append(team1)
     test_X_team2.append(team2)
-clf=LinearSVC(C=0.95)
+clf=LogisticRegression(C=0.1)
 clf.fit(bag_of_words,winlose_Y)
 test_X_team1=vectorizer.transform(test_X_team1)
 test_X_team2=vectorizer.transform(test_X_team2)
@@ -99,4 +103,9 @@ for h in Heroes:
     Heroes[h].append(float(Heroes[h][1])/Heroes[h][0])
 
 for i in range(len(test_Y_team1)):
-    print getbest(Heroes,SampleInput[i+1])
+    if test_Y_team1[i]>test_Y_team2[i]:
+        print 1
+    elif test_Y_team1[i]<test_Y_team2[i]:
+        print 2
+    else:
+        print getbest(Heroes,SampleInput[i+1])
