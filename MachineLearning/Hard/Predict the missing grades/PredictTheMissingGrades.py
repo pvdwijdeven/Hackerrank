@@ -7,7 +7,6 @@ Created on Sat Jun 18 08:21:03 2016
 
 import sys
 from sklearn.linear_model import SGDRegressor
-from sklearn.linear_model import LogisticRegression
 import json
 import numpy
 
@@ -17,7 +16,7 @@ SubjDict= {'serial':0, 'English':1,'Physics':2,'Chemistry':3,
 
 #make sure it works both local and online
 try:
-    filename = "sample-test.in.json"
+    filename = "sample-test2.in.json"
     f = open(filename)
     local=True
 except:
@@ -60,8 +59,11 @@ f.close()
 #fit/train data
 train_X=numpy.array(train_X)
 test_X=numpy.array(test_X)
-#LR=SGDRegressor(epsilon=0.17,fit_intercept=False,penalty='elasticnet',loss='epsilon_insensitive',random_state=5,alpha=0.000001,n_iter=4).fit(train_X[:,1:],train_Y)
-LR=LR=LogisticRegression(C=1.3,random_state=5).fit(train_X[:,1:],train_Y)
+rsmax=0
+zmax=0
+LR=SGDRegressor(epsilon=0.17,fit_intercept=False,penalty='elasticnet',
+                loss='epsilon_insensitive',random_state=692,alpha=0.000001,
+                n_iter=4).fit(train_X[:,1:],train_Y)
 test_Y = LR.predict(test_X[:,1:])
 for i in range(len(test_Y)):
     if test_Y[i]<2:
@@ -73,7 +75,7 @@ for i in range(len(test_Y)):
 #### Predict the result    
 if local:
     #import test output
-    filename = "sample-test.out.json"
+    filename = "sample-test2.out.json"
     f = open(filename)
     z=0
     for x in test_Y:
