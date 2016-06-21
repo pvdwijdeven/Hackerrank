@@ -5,10 +5,10 @@ Spyder Editor
 This is a temporary script file.
 """
 
-import re
+import datetime
+import pandas as pd
+import numpy as np
 
-l=[1,2,3,4,5,1,6,7,8]
-l.remove(l[0])
-print l
-print l.pop()
-print l
+N, past_num, week_num = 1133, 140, 7
+X = [[i] + [1 if j == i % week_num else 0 for j in xrange(week_num)] for i in xrange(N - past_num, N)]
+print X
