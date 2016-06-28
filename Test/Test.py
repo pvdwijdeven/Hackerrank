@@ -4,6 +4,7 @@ Spyder Editor
 
 This is a temporary script file.
 """
+
 import PIL
 from PIL import Image
 basewidth = 300
@@ -17,3 +18,4 @@ hsize = int((float(img.size[1]) * float(wpercent)))
 img = img.resize((basewidth, hsize), PIL.Image.ANTIALIAS)
 
 img.save('resized_image.jpg')
+
