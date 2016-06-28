@@ -4,7 +4,16 @@ Spyder Editor
 
 This is a temporary script file.
 """
-import numpy as np
-a = np.array([[[1,2,3],[2,3,4]],[[5,6,7],[8,9,10]]])
-a[0][0][0:3]=[3,4,5]
-print a
+import PIL
+from PIL import Image
+basewidth = 300
+
+img = Image.open('fullsized_image.jpg')
+
+wpercent = (basewidth / float(img.size[0]))
+
+hsize = int((float(img.size[1]) * float(wpercent)))
+
+img = img.resize((basewidth, hsize), PIL.Image.ANTIALIAS)
+
+img.save('resized_image.jpg')
