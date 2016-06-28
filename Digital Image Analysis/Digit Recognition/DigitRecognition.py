@@ -5,102 +5,52 @@ Created on Mon Jun 27 11:40:11 2016
 @author: pvandewijdeven
 """
 
-
-# -*- coding: utf-8 -*-
-"""
-Spyder Editor
-
-This is a temporary script file.
-"""
-# Author: Gael Varoquaux <gael dot varoquaux at normalesup dot org>
-# License: BSD 3 clause
-
 # Standard scientific Python imports
-import matplotlib.pyplot as plt
-import numpy as np
+
 import math
-# Import datasets, classifiers and performance metrics
-from sklearn import datasets, svm, metrics
+import sys
+from sklearn import datasets, svm
 
-# The digits dataset
-digits = datasets.load_digits()
-
-# The data that we are interested in is made of 8x8 images of digits, let's
-# have a look at the first 3 images, stored in the `images` attribute of the
-# dataset.  If we were working from image files, we could load them using
-# pylab.imread.  Note that each image must have the same size. For these
-# images, we know which digit they represent: it is given in the 'target' of
-# the dataset.
-images_and_labels = list(zip(digits.images, digits.target))
-for index, (image, label) in enumerate(images_and_labels[:4]):
-    plt.subplot(2, 4, index + 1)
-    plt.axis('off')
-    plt.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
-    plt.title('Training: %i' % label)
-
-# To apply a classifier on this data, we need to flatten the image, to
-# turn the data in a (samples, feature) matrix:
-n_samples = len(digits.images)
-data = digits.images.reshape((n_samples, -1))
-
-# Create a classifier: a support vector classifier
-classifier = svm.SVC(gamma=0.001)
-
-# We learn the digits on the first half of the digits
-classifier.fit(data[:n_samples / 2], digits.target[:n_samples / 2])
-
-# Now predict the value of the digit on the second half:
-expected = digits.target[n_samples / 2:]
-predicted = classifier.predict(data[n_samples / 2:])
-i=0
-j=0
-for x in [15, 15, 15, 15, 15, 15, 15, 15, 15, 9, 1, 1, 0, 0, 0, 7, 15, 1, 1, 1, 0, 0, 0, 0, 15, 1, 13, 13, 0, 0, 11, 0, 15, 1, 13, 1, 0, 0, 11, 0, 15, 1, 13, 1, 0, 11, 11, 0, 15, 1, 1, 1, 0, 0, 0, 0, 15, 1, 1, 1, 0, 0, 0, 0]:
-    
-    digits.images[n_samples / 2][i][j]=x
-    i+=1
-    if i==8:
-        i=0
-        j+=1
-        
-i=0
-j=0
-for x in [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 16, 1, 1, 1, 1, 1, 2, 16, 16, 16, 16, 16, 16, 16, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]:
-    
-    digits.images[n_samples / 2+1][i][j]=x
-    i+=1
-    if i==8:
-        i=0
-        j+=1
-
-
-i=0
-j=0
-for x in [0, 7, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 0, 7, 7, 7]:
-    
-    digits.images[n_samples / 2+2][i][j]=x
-    i+=1
-    if i==8:
-        i=0
-        j+=1
- 
-
-
+fontdict={
+'00011000001111000110011011000011110000111100001111000011011001100011110000011000':'0',
+'00011000001110000111100000011000000110000001100000011000000110000001100001111110':'1',
+'00111100011001101100001100000011000001100000110000011000001100000110000011111111':'2',
+'01111100110001100000001100000110000111000000011000000011000000111100011001111100':'3',
+'00000110000011100001111000110110011001101100011011111111000001100000011000000110':'4',
+'11111110110000001100000011011100111001100000001100000011110000110110011000111100':'5',
+'00111100011001101100001011000000110111001110011011000011110000110110011000111100':'6',
+'11111111000000110000001100000110000011000001100000110000011000001100000011000000':'7',
+'00111100011001101100001101100110001111000110011011000011110000110110011000111100':'8',
+'00111100011001101100001111000011011001110011101100000011010000110110011000111100':'9'
+}
 
 try:
-    filename = "SampleText1.txt"
+    filename = "3.txt"
     f = open(filename)
     local=True
 except:
     f= sys.stdin
     local=False
 
+tresh=10
 xscale=8
 yscale=8
 
 def getColorTresh(rgb,tresh):
-    return 16-int((rgb[0] * 0.11 + rgb[1]* 0.59 + rgb[2]* 0.3)/16)
+    grey= 16-int((rgb[0] * 0.11 + rgb[1]* 0.59 + rgb[2]* 0.3)/16)
+    return 0 if grey>tresh else 16
 
-tresh=50
+# The digits dataset
+digits = datasets.load_digits()
+images_and_labels = list(zip(digits.images, digits.target))
+
+
+n_samples = len(digits.images)
+data = digits.images.reshape((n_samples, -1))
+classifier = svm.SVC(gamma=0.001)
+classifier.fit(data, digits.target)
+
+
 xcounter=0
 newImage=[]
 nrows,ncols=map(int,(f.readline().strip()).split(' '))
@@ -113,37 +63,38 @@ for y in range(nrows):
                 rgb=map(int,line[x].split(","))
                 newImageLine.append(getColorTresh(rgb,tresh))
         newImage.append(newImageLine)
+
 zz=0
 predIm=[]
 for i in range(8):
     for j in range(8):
         predIm.append(newImage[j][i])
 
+
+
 if sum(predIm)>64*8:
     for x in range(len(predIm)):
         predIm[x]=16-predIm[x]
 
-#print predIm
 predicted = classifier.predict([predIm]) 
-#print predicted[0]
 
-i=0
-j=0
-for x in predIm:
+print predicted[0]
+
+if local:
+    import matplotlib.pyplot as plt
+    i=0
+    j=0
+    for x in predIm:
+        
+        digits.images[n_samples / 2][i][j]=x
+        i+=1
+        if i==8:
+            i=0
+            j+=1
     
-    digits.images[n_samples / 2+3][i][j]=x
-    i+=1
-    if i==8:
-        i=0
-        j+=1
-x=[1,2,3,4]
-
-images_and_predictions = list(zip(digits.images[n_samples / 2:], predicted))
-#print images_and_predictions[0]
-for index, (image, prediction) in enumerate(images_and_predictions[:4]):
-    plt.subplot(2, 4, index + 5)
-    plt.axis('off')
-    plt.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
-    plt.title('Prediction: %i' % prediction)
-#print images_and_labels[0]
-plt.show()
+    images_and_predictions = list(zip(digits.images[n_samples / 2:], predicted))
+    for index, (image, prediction) in enumerate(images_and_predictions[:4]):
+        plt.axis('off')
+        plt.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
+        plt.title('Prediction: %i' % predicted[0])
+    plt.show()
