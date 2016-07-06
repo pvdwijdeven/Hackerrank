@@ -1,50 +1,111 @@
-debug = True
+# -*- coding: utf-8 -*-
 
-if debug:
-    import time
+"""
+Matrix Layer Rotation
 
-    start = time.time()
-    T = 10
-    Nlist = [10, 15, 20, 5 * 10 ** 6, 10 ** 5, 10 ** 6, 1000, 999, 8, 3]
-else:
-    Nlist = []
-    T = input()
-    for i in range(T):
-        Nlist.append(input())
+Hackerrank - Algorithms - Implementation
 
-limit = max(Nlist) + 1
-collatz_length = [0] * limit
-collatz_length[1] = 1
+Author: PvdWijdeven
+"""
 
-for i in range(1, limit):
-    n, s = i, 0
-    TO_ADD = []  # collatz_length not yet known
-    while n > limit - 1 or collatz_length[n] < 1:
-        TO_ADD.append(n)
-        if n % 2 == 0:
-            n /= 2
-        else:
-            n = 3 * n + 1
-        s += 1
-    # collatz_length now known from previous calculations
-    p = collatz_length[n]
-    for j in range(s):
-        m = TO_ADD[j]
-        if m < limit:
-            new_length = collatz_length[n] + s - j
-            collatz_length[m] = new_length
-maxfound = 0
-maxi = 0
-maxList = []
-for i in range(max(Nlist) + 1):
-    if maxfound <= collatz_length[i]:
-        maxfound = collatz_length[i]
-        maxi = i
-    maxList.append(maxi)
 
-for x in Nlist:
-    print maxList[x]
+#########################
+#Enable/disable debug:  #
+# 0= no debug           #
+# 1= debug unrolling    #
+# 2= debug rolling      #
+# 4= debug rotation     #
+#########################
 
-if debug:
-    elapsed = (time.time() - start)
-    print "found in %s seconds" % elapsed
+debug = 3
+
+
+def getinput():
+    if debug:
+        m, n, r = 5, 4, 7
+        # mymatrix = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16], [17, 18, 19, 20]]
+        mymatrix = [[1, 2, 3, 4], [7, 8, 9, 10], [13, 14, 15, 16], [19, 20, 21, 22], [25, 26, 27, 28]]
+    else:
+        mymatrix = []
+        m, n, r = map(int, raw_input().split())
+        for _ in xrange(M):
+            matrix.append(map(int, raw_input().split()))
+    return m, n, r, mymatrix
+
+
+def unrollmatrix(mm):
+    um = []
+    if debug&1: print"\n***unrollmatrix***"
+    for i in xrange(0, min(N, M) / 2):
+        cur_um = []
+        # left column
+        for r in xrange(i, N + 1 - i):
+            if debug&1: print "left column:", r, i
+            cur_um.append(mm[r][i])
+        # lower row
+        for c in xrange(i + 1, M - i - 1):
+            if debug&1: print "lower row:", N - i, c
+            cur_um.append(mm[N - i][c])
+        # right column
+        for r in xrange(N - i - 1, i, -1):
+            if debug&1: print "right column:", r, M - i - 2
+            cur_um.append(mm[r][M - i - 2])
+        # upper row
+        for c in xrange(M - i - 2, i, -1):
+            if debug&1: print "upper row:", i, c
+            cur_um.append(mm[i][c])
+        um.append(cur_um)
+    return um
+
+
+def rollupmatrix(mlist):
+    if debug & 2: print"\n***rollupmatrix***"
+    localmatrix = [[0 for i in range(N)] for j in range(M)]
+    for i in xrange(0, min(N, M) / 2):
+        # left column
+        j = 0
+        for r in xrange(i, N + 1 - i):
+            if debug&2: print "left column:", r, i, mlist[i][j]
+            localmatrix[r][i] = mlist[i][j]
+            j += 1
+        # lower row
+        for c in xrange(i + 1, M - i - 1):
+            if debug&2: print "lower row:", N - i, c
+            localmatrix[N - i][c] = mlist[i][j]
+            j += 1
+        # right column
+        for r in xrange(N - i - 1, i, -1):
+            if debug&2: print "right column:", r, M - i - 2
+            localmatrix[r][M - i - 2] = mlist[i][j]
+            j += 1
+        # upper row
+        for c in xrange(M - i - 2, i, -1):
+            if debug&2: print "upper row:", i, c
+            localmatrix[i][c] = mlist[i][j]
+            j += 1
+    return localmatrix
+
+
+def rotatematrix(mlist, rotations):
+    if debug & 4: print"\n***rotatematrix***"
+    newlist = mlist
+    return newlist
+
+
+# get input
+M, N, R, matrix = getinput()
+
+# roll out matrix
+unr = unrollmatrix(matrix)
+
+# rotate matrix elements
+rot = rotatematrix(unr, R)
+
+# roll back into matrix
+rol = rollupmatrix(unr)
+
+# print result
+for x in rol:
+    for y in x:
+        print y,
+    print
