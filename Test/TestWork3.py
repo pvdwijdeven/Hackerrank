@@ -1,111 +1,143 @@
 # -*- coding: utf-8 -*-
 
 """
-Matrix Layer Rotation
-
-Hackerrank - Algorithms - Implementation
+Hackerrank - Algorithms - Strings
 
 Author: PvdWijdeven
 """
+# !/usr/bin/py
+import random
 
 
-#########################
-#Enable/disable debug:  #
-# 0= no debug           #
-# 1= debug unrolling    #
-# 2= debug rolling      #
-# 4= debug rotation     #
-#########################
+def create_overview():
+    for x in xrange(vals[0]):
+        no = 0
+        yes = 0
+        source = 0
+        for y in query[x].keys():
+            if query[x][y][0] == 0:
+                no += 1
+            else:
+                yes += 1
+            source = query[x][y][1]
+        max_candidate = 1 if yes > minyes else 0
+        done = 1 if yes + no > mintot or no > minno else 0
+        # format: [#no, #yes, maxCandidate, Done, Source]
+        overview.append([no, yes, max_candidate, done, source])
 
-debug = 3
+    return
 
 
-def getinput():
-    if debug:
-        m, n, r = 5, 4, 7
-        # mymatrix = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16], [17, 18, 19, 20]]
-        mymatrix = [[1, 2, 3, 4], [7, 8, 9, 10], [13, 14, 15, 16], [19, 20, 21, 22], [25, 26, 27, 28]]
+def ask(qval):
+    # Ask for new value
+    while True:
+        x = random.randint(0, n - 1)
+        if x not in query[qval].keys():
+            print qval, x
+            return
+
+
+def next_fill():
+    # first find if action has to be finished
+    for x in xrange(n):
+        if overview[x][4] and overview[x][0] + overview[x][1] > 0:
+            # already started with this ball
+            if overview[x][3] != 1:
+                # not done yet, continue asking
+                ask(x)
+                return
+    # no current actions found, pick random one!
+    while True:
+        x = random.randint(0, n - 1)
+        if overview[x][3] != 1:
+            ask(x)
+            return
+
+
+def next_question():
+    create_overview()
+    if onemore:
+        next_fill()
+        return
     else:
-        mymatrix = []
-        m, n, r = map(int, raw_input().split())
-        for _ in xrange(M):
-            matrix.append(map(int, raw_input().split()))
-    return m, n, r, mymatrix
+        # check for candidates
+        candidates = []
+        for x in xrange(n):
+            if overview[x][2] == 1:
+                candidates.append([x, -1])
+        if len(candidates) == 0:
+            # no candidates found, keep searching
+            next_fill
+            return
+        elif len(candidates) == 1:
+            # 1 candidate found should be the one
+            print candidates[0][0]
+            return
+        else:
+            # multiple candidates found, try to find if in same group
+            for i, can in enumerate(candidates):
+                x = can[0]
+                c = can[1]
+                if c == -1:
+                    # not in group yet
+                    candidates[i] = [x, x]
+                    for j, y in enumerate(candidates):
+                        if query[x][y[0]][0] == 1:
+                            candidates[j] == [y[0], x]
+            grpdict = {}
+            for x, c in candidates:
+                # select ball from biggest group
+                if c in grpdict:
+                    grpdict[c] += 1
+                else:
+                    grpdict[c] = 1
+            maxval = 0
+            maxkey = -1
+            doublemax = False
+            for x in grpdict.keys():
+                if grpdict[x] > maxval:
+                    maxval = grpdict[x]
+                    maxkey = x
+                    doublemax = False
+                elif grpdict[x] == maxval:
+                    doublemax = True
+            if doublemax:
+                # ex-equo found, search further
+                next_fill()
+                return
+            else:
+                # max group found
+                print maxkey
+                return
 
 
-def unrollmatrix(mm):
-    um = []
-    if debug&1: print"\n***unrollmatrix***"
-    for i in xrange(0, min(N, M) / 2):
-        cur_um = []
-        # left column
-        for r in xrange(i, N + 1 - i):
-            if debug&1: print "left column:", r, i
-            cur_um.append(mm[r][i])
-        # lower row
-        for c in xrange(i + 1, M - i - 1):
-            if debug&1: print "lower row:", N - i, c
-            cur_um.append(mm[N - i][c])
-        # right column
-        for r in xrange(N - i - 1, i, -1):
-            if debug&1: print "right column:", r, M - i - 2
-            cur_um.append(mm[r][M - i - 2])
-        # upper row
-        for c in xrange(M - i - 2, i, -1):
-            if debug&1: print "upper row:", i, c
-            cur_um.append(mm[i][c])
-        um.append(cur_um)
-    return um
+if __name__ == '__main__':
+    vals = [int(i) for i in raw_input().strip().split()]
+    query_size = input()
+    query = {}
+    for i in range(vals[0]):
+        query[i] = {}
 
+    for i in range(query_size):
+        temp = [j for j in raw_input().strip().split()]
+        if temp[2] == "YES":
+            query[int(temp[0])][int(temp[1])] = [1, 1]
+            query[int(temp[1])][int(temp[0])] = [1, 0]
+        else:
+            query[int(temp[0])][int(temp[1])] = [0, 1]
+            query[int(temp[1])][int(temp[0])] = [0, 0]
+    onemore = query_size < (vals[2] + 1) * vals[0] / 2
+    n = vals[0]
+    plurality = vals[1]
+    lies = vals[2]
+    color = vals[3]
+    exact_lies = vals[4]
 
-def rollupmatrix(mlist):
-    if debug & 2: print"\n***rollupmatrix***"
-    localmatrix = [[0 for i in range(N)] for j in range(M)]
-    for i in xrange(0, min(N, M) / 2):
-        # left column
-        j = 0
-        for r in xrange(i, N + 1 - i):
-            if debug&2: print "left column:", r, i, mlist[i][j]
-            localmatrix[r][i] = mlist[i][j]
-            j += 1
-        # lower row
-        for c in xrange(i + 1, M - i - 1):
-            if debug&2: print "lower row:", N - i, c
-            localmatrix[N - i][c] = mlist[i][j]
-            j += 1
-        # right column
-        for r in xrange(N - i - 1, i, -1):
-            if debug&2: print "right column:", r, M - i - 2
-            localmatrix[r][M - i - 2] = mlist[i][j]
-            j += 1
-        # upper row
-        for c in xrange(M - i - 2, i, -1):
-            if debug&2: print "upper row:", i, c
-            localmatrix[i][c] = mlist[i][j]
-            j += 1
-    return localmatrix
+    # todo: find optimal factor
+    factor = 0.7
+    minyes = n / color * 0.8
+    minno = (color - 1) * n / color * 0.6
+    mintot = n * factor
+    overview = []
 
-
-def rotatematrix(mlist, rotations):
-    if debug & 4: print"\n***rotatematrix***"
-    newlist = mlist
-    return newlist
-
-
-# get input
-M, N, R, matrix = getinput()
-
-# roll out matrix
-unr = unrollmatrix(matrix)
-
-# rotate matrix elements
-rot = rotatematrix(unr, R)
-
-# roll back into matrix
-rol = rollupmatrix(unr)
-
-# print result
-for x in rol:
-    for y in x:
-        print y,
-    print
+    next_question()
