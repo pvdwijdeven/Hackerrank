@@ -1,95 +1,81 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jun 30 13:56:18 2016
+#!/usr/bin/py
 
-@author: pvandewijdeven
-"""
+donelist = []
 
-neighbours=[]   # list of neighbours per house
-debug = True
-totList=[]
-totValues=[]
-roads=[]
 
-def visitHouse(housesToVisit,level,curList):
-    startList=list(curList)
-    global totlist
-    for house in housesToVisit:
-        if debug: print "Visiting house: ", house, " level: ",level, " curList: ", 
-        todo=list(housesToVisit)
-        curList.append(house)
-        if debug: print curList
-        todo.remove(house)
-        for neighbour in neighbours[house]:
-            if neighbour in todo:
-                todo.remove(neighbour)
-        if todo<>[]:
-            visitHouse(todo,level+1,curList)
-            curList.pop()
+def ask(nn):
+    for x in xrange(0, vals[0]):
+        nextitem = nn + 1
+        if x != nn and x not in query[nn].keys():
+            print nn, x
+            return
+        elif x != nn:
+            # todo: none for all previous items
+            if not query[nn][x]:
+                nextitem = x
+    donelist.append(x)
+    if len(donelist) > vals[3] + 2:
+        # just pick biggest YES
+        answer()
+    else:
+        ask(nextitem)
+
+
+def answer():
+    maxfound = 0
+    maxx = -1
+    for x in donelist:
+        found = 0
+        for y in query[x].keys():
+            if query[x][y] == 1:
+                found += 1
+        if maxfound <= found:
+            maxx = y
+            maxfound = found
+    print maxx
+
+
+def nextQuestion(n, plurality, lies, color, exact_lies, query):
+    nfactor = (n - 2 * plurality) / (color * 2 - 1)
+    if exact_lies > 0:
+        liesf = lies / 4
+    else:
+        liesf = exact_lies / 2
+    for x in xrange(0, n):
+        no = 0
+        yes = 0
+        for y in query[x].keys():
+            if query[x][y] == 0:
+                no += 1
+            else:
+                yes += 1
+        if yes >= liesf + nfactor and query_size >= (lies + 1) * n / 2:
+            print x
+            return
+        elif no <= liesf + nfactor:
+            ask(x)
+            return
         else:
-            totList.append(list(curList))
-            value=0
-            for x in curList:
-                value+=values[x]
-            totValues.append(value)
-            curList.pop()
-    curList=list(startList)
+            donelist.append(x)
+            if len(donelist) > vals[3] + 2:
+                # just pick biggest YES
+                answer()
 
-if debug:
-    N=4
-    M=4
-    values=[0,0,0,0]
-    roads=[[1,2],[2,4],[4,3],[3,1]]
-else:
-    N,M=map(int,raw_input().split())
-    values=map(int,raw_input().split())
-    for _ in range(M):
-        roads.append(map(int,raw_input().split()))
 
-for house in xrange(N):
-    neighbour=[]
-    for road_ in roads:
-        if road_[1]==house+1:
-            neighbour.append(road_[0]-1)
-        if road_[0]==house+1:
-            neighbour.append(road_[1]-1)
-    neighbours.append(neighbour)
+if __name__ == '__main__':
+    vals = [int(i) for i in raw_input().strip().split()]
+    query_size = input()
+    query = {}
+    for i in range(vals[0]):
+        query[i] = {}
 
-visitHouse(range(N),0,[])
-if debug: print "totList: ", totList
-if debug: print "totValues: ", totValues
-
-maxValue=max(totValues)
-
-maxList=[]
-for i in range(len(totValues)):
-    if totValues[i]==maxValue:
-        maxList.append(totList[i])
-for i in range(len(maxList)):
-    maxList[i].sort()
-   
-maxList = sorted(set(map(tuple, maxList)), reverse=True)
-if debug: print "maxlist before 0 prizes: ", maxList
-
-zeroList=[]
-zeros=[]
-for x in maxList:
-    temp=[]
-    count=0
-    for y in x:
-        if values[y]==0:
-            count+=1
+    for i in range(query_size):
+        temp = [j for j in raw_input().strip().split()]
+        if temp[2] == "YES":
+            query[int(temp[0])][int(temp[1])] = 1
+            query[int(temp[1])][int(temp[0])] = 1
         else:
-            temp.append(y)
-    if count>0:
-        zeroList.append(list(temp))
-        zeros.append(count)
+            query[int(temp[0])][int(temp[1])] = 0
+            query[int(temp[1])][int(temp[0])] = 0
 
-if debug: print "zeroList: ", zeroList
-if debug: print "zeros: ", zeros
-zerosValue=0
-for x in zeros:
-    zerosValue+=(2**x)-1
-
-print maxValue,
-print len(maxList)+zerosValue-(len(zeroList)-len(sorted(set(map(tuple, zeroList)), reverse=True)))
+    nextQuestion(vals[0], vals[1], vals[2], vals[3], vals[4], query)
