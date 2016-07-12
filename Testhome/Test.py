@@ -1,62 +1,53 @@
-import math
+#
+# Write centrality_max to return the maximum distance
+# from a node to all the other nodes it can reach
+#
 
+def centrality_max(G, v):
+    # use DFS
+    todo=[v]
+    marked={}
+    curlevel=0
+    while todo:
+        curnode=todo[0]
+        marked[curnode]=curlevel
+        for neighbor in G[curnode]:
+            if neighbor not in marked:
+                todo.append(neighbor)
+        curlevel=+1
+        todo.pop(0)
+    result=max(marked.values())
+    print marked
+    print result
+    return result
 
-def sign(x):
-    if x < 0:
-        return -1
-    if x == 0:
-        return 0
-    if x > 0:
-        return 1
+#################
+# Testing code
+#
+def make_link(G, node1, node2):
+    if node1 not in G:
+        G[node1] = {}
+    (G[node1])[node2] = 1
+    if node2 not in G:
+        G[node2] = {}
+    (G[node2])[node1] = 1
+    return G
 
-
-# left is the left index for the interval
-# right is the right index for the interval
-# k is the desired index value, where array[k] is the (k+1)th smallest element when left = 0
-def median(array, left, right):
-    k = len(array) / 2
-    while right > left:
-        # use select recursively to sample a smaller set of size s
-        # the arbitrary constants 600 and 0.5 are used in the original
-        # version to minimize execution time
-        if right - left > 600:
-            n = right - left + 1
-            i = k - left + 1
-            z = math.log(n)
-            s = 0.5 * math.exp(2 * z / 3)
-            sd = 0.5 * math.sqrt(z * s * (n - s) / n) * sign(i - n / 2)
-            newLeft = int(max(left, k - i * s / n + sd))
-            newRight = int(min(right, k + (n - i) * s / n + sd))
-            median(array, newLeft, newRight)
-        # partition the elements between left and right around t
-        t = array[k]
-        i = left
-        j = right
-        array[left], array[k] = array[k], array[left]
-        if array[right] > t:
-            array[right], array[left] = array[left], array[right]
-        while i < j:
-            array[i], array[j] = array[j], array[i]
-            i = i + 1
-            j = j - 1
-            while array[i] < t:
-                i = i + 1
-            while array[j] > t:
-                j = j - 1
-        if array[left] == t:
-            array[left], array[j] = array[j], array[left]
-        else:
-            j = j + 1
-            array[j], array[right] = array[right], array[j]
-        # adjust left and right towards the boundaries of the subset
-        # containing the (k - left + 1)th smallest element
-        if j <= k:
-            left = j + 1
-        if k <= j:
-            right = j - 1
-
-
-m = input()
-ar = map(int, raw_input().split())
-median(ar, 0, len(ar) - 1)
-print ar[m / 2]
+def test():
+    chain = ((1,2), (2,3), (3,4), (4,5), (5,6))
+    G = {}
+    for n1, n2 in chain:
+        make_link(G, n1, n2)
+    assert centrality_max(G, 1) == 5
+    assert centrality_max(G, 3) == 3
+    tree = ((1, 2), (1, 3),
+            (2, 4), (2, 5),
+            (3, 6), (3, 7),
+            (4, 8), (4, 9),
+            (6, 10), (6, 11))
+    G = {}
+    for n1, n2 in tree:
+        make_link(G, n1, n2)
+    assert centrality_max(G, 1) == 3
+    assert centrality_max(G, 11) == 6
+test()
