@@ -1,30 +1,47 @@
-import sys
+#!/usr/bin/py
+# todo: check every value until >lies NO or YES
+# todo: if NO --> next until YES and queries >=(lies+1) *n/2
 
-n = input()
+factor=3
 
-for _ in range(n):
-    size, mod = map(int, raw_input().split())
-    arr = map(int, raw_input().split())
+def ask(nn):
+    for x in xrange(0,vals[0]):
+        if x!=nn and not x in query[nn].keys():
+            print nn,x
+            return
+    ask(nn+1)
 
-    sums = [-1] * size
-    temp = [-1] * 2
-    temp[0] = arr[0] % mod
-    temp[1] = 0
-    sums[0] = temp
-    for pos in range(1, size):  # calculate prefix sums
-        temp = [-1] * 2
-        temp[0] = (sums[pos - 1][0] + (arr[pos] % mod)) % mod
-        temp[1] = pos
-        sums[pos] = temp
+def nextQuestion(n, plurality, lies, color, exact_lies, query):
+    result=-1
+    for x in xrange(0,n):
+        no=0
+        yes=0
+        for y in query[x].keys():
+            if query[x][y]==0:
+                no+=1
+            else:
+                yes+=1
+        if yes>=lies+(n/factor) and query_size>=(lies+1)*n/2:
+            print x
+            return
+        elif no <= lies + (n / factor):
+            ask(x)
+            return
 
-    sums = sorted(sums)
-    minimum = -1
+if __name__ == '__main__':
+    vals = [int(i) for i in raw_input().strip().split()]
+    query_size = input()
+    query = {}
+    for i in range(vals[0]):
+        query[i] = {}
 
-    for pos in range(0, size - 1):  # determine the minimum
-        if sums[pos][1] > sums[pos + 1][1] and (sums[pos + 1][0] - sums[pos][0] < minimum or minimum == -1):
-            minimum = sums[pos + 1][0] - sums[pos][0]
+    for i in range(query_size):
+        temp = [j for j in raw_input().strip().split()]
+        if temp[2] == "YES":
+            query[int(temp[0])][int(temp[1])] = 1
+            query[int(temp[1])][int(temp[0])] = 1
+        else:
+            query[int(temp[0])][int(temp[1])] = 0
+            query[int(temp[1])][int(temp[0])] = 0
 
-    if sums[size - 1][0] > mod - minimum:  # edge case
-        minimum = mod - sums[size - 1][0]
-
-    print mod - minimum
+    nextQuestion(vals[0], vals[1], vals[2], vals[3], vals[4], query)
