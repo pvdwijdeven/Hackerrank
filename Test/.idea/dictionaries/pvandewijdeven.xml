@@ -2,6 +2,7 @@
   <dictionary name="pvandewijdeven">
     <words>
       <w>collatz</w>
+      <w>eulerian</w>
       <w>maxfound</w>
       <w>mymatrix</w>
       <w>nlist</w>
